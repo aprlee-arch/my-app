@@ -8,7 +8,7 @@ if "logged_in" not in st.session_state:
 
 # --- 2. 로그인 안 했을 때만 비밀번호 창 보여주기 ---
 if not st.session_state.logged_in:
-    password = st.text_input("나만의 비밀번호를 입력하세요 🔒", type="password")
+    password = st.text_input("펜타 점심시간 HHmm를 입력해주세요 (예 1130) 🔒", type="password")
     
     if password == "1130":  # 원하는 비밀번호 숫자로 변경하세요!
         st.session_state.logged_in = True
@@ -25,7 +25,7 @@ if st.session_state.logged_in:
     api_key = "ab13d19ee1e9080db6e7c939474ebb5c"
     
     # 사용자가 직접 동네를 입력할 수 있는 창!
-    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
+    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "여의도동") 
     st.write("예시: 광명역, 부천역, 여의도동 등 자유롭게 적어보세요!")
 
     # --- 마법의 클릭 버튼 만들기 ---
