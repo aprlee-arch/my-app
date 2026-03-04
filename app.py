@@ -18,7 +18,7 @@ if not st.session_state.logged_in:
 
 # --- 3. 로그인 성공 시에만 나타나는 진짜 내 앱 화면 ---
 if st.session_state.logged_in:
-    st.title("🍕🍕 정기흡수 메뉴 고르기 👈(ﾟヮﾟ👈)")
+    st.title("정기흡수 메뉴 고르기 👈(ﾟヮﾟ👈)")
     st.write("버튼을 누르면 카카오 지도가 식당을 하나 골라줍니다!")
 
     # 내 출입증과 동네 설정
