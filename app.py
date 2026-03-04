@@ -28,25 +28,33 @@ if st.session_state.logged_in:
     location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "여의도동") 
     st.write("예시: 광명역, 부천역, 여의도동 등 자유롭게 적어보세요!")
 
-    # --- 마법의 클릭 버튼 만들기 ---
-    if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
-        
-        # 카카오 API 요청 코드
-        query = f"{location} 맛집"
-        url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6"
-        headers = {"Authorization": f"KakaoAK {api_key}"}
+# --- 마법의 클릭 버튼 만들기 ---
+        if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
+            
+            restaurants = [] # 식당을 담을 빈 바구니 준비
+            
+            # 1페이지부터 3페이지까지 (최대 45개) 반복해서 카카오에게 달라고 조르기!
+            for page in range(1, 4): 
+                query = f"{location} 맛집"
+                # 주소 맨 끝에 '&page={page}' 를 붙여서 몇 페이지인지 알려줍니다
+                url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
+                headers = {"Authorization": f"KakaoAK {api_key}"}
 
-        response = requests.get(url, headers=headers)
-        result = response.json()
+                response = requests.get(url, headers=headers)
+                result = response.json()
 
-        restaurants = []
-        for place in result.get('documents', []):
-            restaurants.append(place['place_name'])
+                # 바구니에 식당 이름 담기
+                for place in result.get('documents', []):
+                    restaurants.append(place['place_name'])
+                
+                # 만약 동네가 작아서 식당이 다 떨어졌으면(마지막 페이지면) 그만 가져오기
+                if result.get('meta', {}).get('is_end'):
+                    break
 
-        # --- 결과 보여주기 ---
-        if restaurants:
-            st.write(f"📍 **{location}** 주변 식당 {len(restaurants)}개를 찾았어요!")
-            st.write("🥁 두구두구두구... 오늘의 추천 점심 메뉴는?!")
-            st.subheader(f"👉 [ {random.choice(restaurants)} ] 👈")
-        else:
-            st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
+            # --- 결과 보여주기 ---
+            if restaurants:
+                st.write(f"📍 **{location}** 주변 식당 {len(restaurants)}개를 싹싹 긁어왔어요!")
+                st.write("🥁 두구두구두구... 오늘의 추천 점심 메뉴는?!")
+                st.subheader(f"👉 [ {random.choice(restaurants)} ] 👈")
+            else:
+                st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
