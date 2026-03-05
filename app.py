@@ -109,30 +109,29 @@ if st.session_state.logged_in:
                 except Exception as e:
                     st.info("사진을 불러오지 못했어요. 😅")
 
-            # --- 🗺️ [오른쪽 칸] 지도 띄우기 ---
-    # --- 🗺️ [오른쪽 칸] 지도 띄우기 (Outdoors 테마!) ---
-                with col2:
-                    map_data = pd.DataFrame({'lat': [lat], 'lon': [lon]})
-                    
-                    # 1. 지도의 중심점과 확대 정도(zoom) 설정
-                    view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=15)
-                    
-                    # 2. 식당 위치에 예쁜 빨간색 점(마커) 찍기
-                    layer = pdk.Layer(
-                        'ScatterplotLayer',
-                        data=map_data,
-                        get_position='[lon, lat]',
-                        get_radius=50, # 점의 크기
-                        get_fill_color='[255, 50, 50]', # 점의 색상 (빨간색)
-                        pickable=True
-                    )
-                    
-                    # 3. Outdoors 테마로 멋진 지도 그리기!
-                    st.pydeck_chart(pdk.Deck(
-                        map_style='mapbox://styles/mapbox/outdoors-v11', # 👈 여기가 테마를 결정하는 마법의 주문입니다
-                        initial_view_state=view_state,
-                        layers=[layer]
-                    ))
+            # --- 🗺️ [오른쪽 칸] 지도 띄우기 --- #
 
+            with col2:
+                map_data = pd.DataFrame({'lat': [lat], 'lon': [lon]})
+                
+                # 1. 지도의 중심점과 확대 정도(zoom) 설정
+                view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=15)
+                
+                # 🚨 에러 원인 해결: 색상과 위치에서 문제의 '따옴표'를 제거했습니다!
+                layer = pdk.Layer(
+                    'ScatterplotLayer',
+                    data=map_data,
+                    get_position=['lon', 'lat'],    # 👈 따옴표 제거!
+                    get_radius=50,                  # 점의 크기
+                    get_fill_color=[255, 50, 50],   # 👈 따옴표 완전 제거! (숫자 리스트로 변경)
+                    pickable=True
+                )
+                
+                # 3. Outdoors 테마로 멋진 지도 그리기!
+                st.pydeck_chart(pdk.Deck(
+                    map_style='mapbox://styles/mapbox/outdoors-v11', 
+                    initial_view_state=view_state,
+                    layers=[layer]
+                ))
         else:
             st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
