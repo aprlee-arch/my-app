@@ -52,31 +52,31 @@ if st.session_state.logged_in:
                 break
 
 # --- 결과 보여주기 및 사진 띄우기! ---
-    if restaurants:
-        st.write(f"📍 **{location}** 주변 식당 {len(restaurants)}개를 싹싹 긁어왔어요!")
-        st.write("🥁 두구두구두구... 오늘의 추천 점심 메뉴는?!")
-        
-        # 1. 룰렛 돌려서 식당 하나 뽑기
-        selected_restaurant = random.choice(restaurants)
-        
-        # 뽑힌 식당 이름 크게 보여주기
-        st.subheader(f"👉 [ {selected_restaurant} ] 👈")
-        
-        # 2. 카카오 이미지 검색 API로 방금 뽑힌 식당 사진 찾아오기!
-        image_query = f"{location} {selected_restaurant}" # 예: "광명역 홍콩반점"
-        image_search_url = f"https://dapi.kakao.com/v2/search/image?query={image_query}&size=1"
-        
-        # 출입증(headers)은 아까 지도 검색할 때 썼던 걸 그대로 씁니다
-        image_response = requests.get(image_search_url, headers=headers)
-        image_result = image_response.json()
-        
-        # 3. 사진이 성공적으로 찾아졌다면 화면에 예쁘게 띄우기
-        if image_result.get('documents'):
-            img_url = image_result['documents'][0]['image_url']
-            # st.image()가 스트림릿에서 마법처럼 사진을 띄워주는 명령어입니다
-            st.image(img_url, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
+        if restaurants:
+            st.write(f"📍 **{location}** 주변 식당 {len(restaurants)}개를 싹싹 긁어왔어요!")
+            st.write("🥁 두구두구두구... 오늘의 추천 점심 메뉴는?!")
+            
+            # 1. 룰렛 돌려서 식당 하나 뽑기
+            selected_restaurant = random.choice(restaurants)
+            
+            # 뽑힌 식당 이름 크게 보여주기
+            st.subheader(f"👉 [ {selected_restaurant} ] 👈")
+            
+            # 2. 카카오 이미지 검색 API로 방금 뽑힌 식당 사진 찾아오기!
+            image_query = f"{location} {selected_restaurant}" # 예: "광명역 홍콩반점"
+            image_search_url = f"https://dapi.kakao.com/v2/search/image?query={image_query}&size=1"
+            
+            # 출입증(headers)은 아까 지도 검색할 때 썼던 걸 그대로 씁니다
+            image_response = requests.get(image_search_url, headers=headers)
+            image_result = image_response.json()
+            
+            # 3. 사진이 성공적으로 찾아졌다면 화면에 예쁘게 띄우기
+            if image_result.get('documents'):
+                img_url = image_result['documents'][0]['image_url']
+                # st.image()가 스트림릿에서 마법처럼 사진을 띄워주는 명령어입니다
+                st.image(img_url, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
+            else:
+                st.info("앗, 이 식당은 인터넷에서 사진을 찾지 못했어요 😢")
+    
         else:
-            st.info("앗, 이 식당은 인터넷에서 사진을 찾지 못했어요 😢")
-
-    else:
-        st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
+            st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
