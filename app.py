@@ -36,62 +36,55 @@ if st.session_state.logged_in:
 
     # 2. 아이 동반 체크박스
     is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
-    
+
+
     # --- 마법의 클릭 버튼 만들기 ---
     if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
         
         restaurants = []
         
         for page in range(1, 4): 
-            # ✅ 선택한 메뉴에 따라 기본 검색어 정하기 (예: '아무거나'면 '맛집', 아니면 '한식')
+            # 검색어 조립하기
             base_keyword = "맛집" if cuisine == "아무거나" else cuisine
-            
-            # ✅ 체크박스에 따라 최종 검색어 조립하기
             if is_kids_friendly:
                 kids_keywords = ["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]
-                # 예: "광명 한식 예스키즈존" 으로 검색!
                 query = f"{location} {base_keyword} {random.choice(kids_keywords)}"
             else:
-                # 예: "광명 중식" 으로 검색!
                 query = f"{location} {base_keyword}"
 
-            url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
-            headers = {"Authorization": f"KakaoAK {api_key}"}
-
-        # ...(이 아래 부분은 파이썬이 사진 가져오고 결과 보여주는 기존 코드 그대로 둡니다!)...
-        
-        # 1페이지부터 3페이지까지 (최대 45개) 반복해서 카카오에게 달라고 조르기!
-        for page in range(1, 4): 
-            query = f"{location} 맛집"
-            # 주소 맨 끝에 '&page={page}' 를 붙여서 몇 페이지인지 알려줍니다
             url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
             headers = {"Authorization": f"KakaoAK {api_key}"}
 
             response = requests.get(url, headers=headers)
             result = response.json()
 
-            # 바구니에 식당 이름 담기
+            # ✅ [여기서부터 바뀝니다!] 이름뿐만 아니라 카카오맵 주소(place_url)도 바구니에 같이 담습니다!
             for place in result.get('documents', []):
-                restaurants.append(place['place_name'])
-            
-            # 만약 동네가 작아서 식당이 다 떨어졌으면(마지막 페이지면) 그만 가져오기
+                restaurants.append({
+                    "name": place['place_name'],
+                    "link": place['place_url']
+                })
+                
             if result.get('meta', {}).get('is_end'):
                 break
 
-# --- 결과 보여주기 및 사진 띄우기! ---
+        # --- 결과 보여주기 ---
         if restaurants:
             st.write(f"📍 **{location}** 주변 식당 {len(restaurants)}개를 싹싹 긁어왔어요!")
             st.write("🥁 두구두구두구... 오늘의 추천 점심 메뉴는?!")
             
-            # 1. 룰렛 돌려서 식당 하나 뽑기
-            selected_restaurant = random.choice(restaurants)
+            # 1. 룰렛 돌려서 식당 하나 뽑기 (이제 이름과 링크가 세트로 뽑혀요!)
+            selected_data = random.choice(restaurants)
+            selected_restaurant = selected_data["name"]
+            restaurant_link = selected_data["link"]
             
-            # 뽑힌 식당 이름 크게 보여주기
+            # 2. 뽑힌 식당 이름 크게 보여주기
             st.subheader(f"👉 [ {selected_restaurant} ] 👈")
             
-            # 2. 카카오 이미지 검색 API로 방금 뽑힌 식당 사진 찾아오기!
-            image_query = f"{location} {selected_restaurant}" # 예: "광명역 홍콩반점"
-# --- 🛡️ 에러 방어막(try-except) 시작! ---
+            # ⭐️ 3. 대망의 상세보기 버튼 띄우기! (스트림릿의 마법 버튼)
+            st.link_button("🗺️ 카카오맵에서 방문자 리뷰 & 메뉴판 확인하기", restaurant_link)
+            
+            # --- 🛡️ 에러 방어막(try-except) 시작! (사진 띄우기) ---
             try:
                 image_search_url = "https://dapi.kakao.com/v2/search/image"
                 params = {
@@ -102,14 +95,9 @@ if st.session_state.logged_in:
                 image_response = requests.get(image_search_url, headers=headers, params=params)
                 image_result = image_response.json()
                 
-                # --- 🚨 여기서부터 바뀝니다! ---
                 if image_result.get('documents'):
                     img_url = image_result['documents'][0]['image_url']
-                    
-                    # 주소만 띡 던져주지 않고, 파이썬(requests)이 직접 사진 데이터를 다운로드합니다!
                     img_data = requests.get(img_url).content
-                    
-                    # 다운받은 사진 데이터(img_data)를 화면에 띄웁니다
                     st.image(img_data, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
                 else:
                     st.info("앗, 이 식당은 인터넷에서 사진을 찾지 못했어요 😢")
@@ -117,7 +105,6 @@ if st.session_state.logged_in:
             except Exception as e:
                 st.info("사진을 불러오지 못했어요. 식당 이름으로 만족해 주세요! 😅")
             # --- 🛡️ 에러 방어막 끝! ---
-            
-    
+
         else:
             st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
