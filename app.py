@@ -109,8 +109,7 @@ if st.session_state.logged_in:
                 except Exception as e:
                     st.info("사진을 불러오지 못했어요. 😅")
 
-            # --- 🗺️ [오른쪽 칸] 지도 띄우기 --- #
-
+# --- 🗺️ [오른쪽 칸] 지도 띄우기 (Outdoors 테마!) ---
             with col2:
                 map_data = pd.DataFrame({'lat': [lat], 'lon': [lon]})
                 
