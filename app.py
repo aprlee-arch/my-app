@@ -116,4 +116,3 @@ if st.session_state.logged_in:
 
         else:
             st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
-            st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
