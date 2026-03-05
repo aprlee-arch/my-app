@@ -28,10 +28,6 @@ if st.session_state.logged_in:
     location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
     st.write("예시: 광명역, 부천역, 여의도동 등 자유롭게 적어보세요!")
 
-# 사용자가 직접 동네를 입력할 수 있는 창!
-    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
-    st.write("예시: 광명역, 부천역, 시흥 배곧 등 자유롭게 적어보세요!")
-
     # --- 🎁 새로운 맞춤형 기능: 음식 종류 & 체크박스 ---
     st.write("---") 
     
