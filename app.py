@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import random
+import pandas as pd
 
 # --- 1. 로그인 상태를 기억하는 '기억 상자' 만들기 ---
 if "logged_in" not in st.session_state:
@@ -38,13 +39,14 @@ if st.session_state.logged_in:
     is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
 
     st.write("---") 
-    # --- 마법의 클릭 버튼 만들기 ---
+
+    
+# --- 마법의 클릭 버튼 만들기 ---
     if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
         
         restaurants = []
         
         for page in range(1, 4): 
-            # 검색어 조립하기
             base_keyword = "맛집" if cuisine == "아무거나" else cuisine
             if is_kids_friendly:
                 kids_keywords = ["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]
@@ -58,11 +60,13 @@ if st.session_state.logged_in:
             response = requests.get(url, headers=headers)
             result = response.json()
 
-            # ✅ [여기서부터 바뀝니다!] 이름뿐만 아니라 카카오맵 주소(place_url)도 바구니에 같이 담습니다!
+            # ✅ 이름, 링크와 함께 '지도 좌표(x, y)'도 바구니에 같이 담습니다!
             for place in result.get('documents', []):
                 restaurants.append({
                     "name": place['place_name'],
-                    "link": place['place_url']
+                    "link": place['place_url'],
+                    "lat": float(place['y']), # 위도
+                    "lon": float(place['x'])  # 경도
                 })
                 
             if result.get('meta', {}).get('is_end'):
@@ -73,38 +77,43 @@ if st.session_state.logged_in:
             st.write(f"📍 **{location}** 주변 식당 {len(restaurants)}개를 싹싹 긁어왔어요!")
             st.write("🥁 두구두구두구... 오늘의 추천 점심 메뉴는?!")
             
-            # 1. 룰렛 돌려서 식당 하나 뽑기 (이제 이름과 링크가 세트로 뽑혀요!)
             selected_data = random.choice(restaurants)
             selected_restaurant = selected_data["name"]
             restaurant_link = selected_data["link"]
+            lat = selected_data["lat"]
+            lon = selected_data["lon"]
             
-            # 2. 뽑힌 식당 이름 크게 보여주기
             st.subheader(f"👉 [ {selected_restaurant} ] 👈")
+            st.link_button("🗺️ 카카오맵에서 방문자 리뷰 & 메뉴판 확인하기", restaurant_link)
             
-            # ⭐️ 3. 대망의 상세보기 버튼 띄우기! (스트림릿의 마법 버튼)
-            st.link_button("📣 카카오맵에서 방문자 리뷰 & 메뉴판 확인하기", restaurant_link)
+            # ⭐️ 화면을 두 칸으로 나누기! (왼쪽: 사진, 오른쪽: 지도)
+            col1, col2 = st.columns(2) 
             
-            # --- 🛡️ 에러 방어막(try-except) 시작! (사진 띄우기) ---
-            try:
-                image_search_url = "https://dapi.kakao.com/v2/search/image"
-                params = {
-                    "query": f"{location} {selected_restaurant}",
-                    "size": 1
-                }
-                
-                image_response = requests.get(image_search_url, headers=headers, params=params)
-                image_result = image_response.json()
-                
-                if image_result.get('documents'):
-                    img_url = image_result['documents'][0]['image_url']
-                    img_data = requests.get(img_url).content
-                    st.image(img_data, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
-                else:
-                    st.info("앗, 이 식당은 인터넷에서 사진을 찾지 못했어요 😢")
+            # --- 🛡️ [왼쪽 칸] 사진 띄우기 ---
+            with col1:
+                try:
+                    image_search_url = "https://dapi.kakao.com/v2/search/image"
+                    params = {"query": f"{location} {selected_restaurant}", "size": 1}
+                    image_response = requests.get(image_search_url, headers=headers, params=params)
+                    image_result = image_response.json()
                     
-            except Exception as e:
-                st.info("사진을 불러오지 못했어요. 식당 이름으로 만족해 주세요! 😅")
-            # --- 🛡️ 에러 방어막 끝! ---
+                    if image_result.get('documents'):
+                        img_url = image_result['documents'][0]['image_url']
+                        img_data = requests.get(img_url).content
+                        # 사진이 col1(절반 크기)에 쏙 맞게 들어갑니다
+                        st.image(img_data, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
+                    else:
+                        st.info("앗, 인터넷에서 사진을 찾지 못했어요 😢")
+                        
+                except Exception as e:
+                    st.info("사진을 불러오지 못했어요. 😅")
+
+            # --- 🗺️ [오른쪽 칸] 지도 띄우기 ---
+            with col2:
+                # 위도, 경도를 판다스(pandas) 표로 만들어서 예쁜 지도를 그립니다
+                map_data = pd.DataFrame({'lat': [lat], 'lon': [lon]})
+                st.map(map_data, zoom=15) # zoom 숫자를 키우면 지도가 더 확대됩니다!
 
         else:
+            st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
             st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
