@@ -28,10 +28,17 @@ if st.session_state.logged_in:
     location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
     st.write("예시: 광명역, 부천역, 여의도동 등 자유롭게 적어보세요!")
 
-    # --- 🎁 새로운 맞춤형 기능: 체크박스 만들기 ---
-    st.write("---") # 화면에 예쁜 가로줄을 하나 그어줍니다
+# 사용자가 직접 동네를 입력할 수 있는 창!
+    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
+    st.write("예시: 광명역, 부천역, 시흥 배곧 등 자유롭게 적어보세요!")
+
+    # --- 🎁 새로운 맞춤형 기능: 음식 종류 & 체크박스 ---
+    st.write("---") 
     
-    # 체크박스를 누르면 is_kids_friendly 가 True(참)가 됩니다
+    # 1. 음식 종류를 선택하는 깔끔한 메뉴 창 만들기
+    cuisine = st.selectbox("🍜 어떤 종류의 음식이 땡기시나요?", ["아무거나", "한식", "중식", "일식", "양식", "분식"])
+
+    # 2. 아이 동반 체크박스
     is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
     
     # --- 마법의 클릭 버튼 만들기 ---
@@ -40,19 +47,22 @@ if st.session_state.logged_in:
         restaurants = []
         
         for page in range(1, 4): 
-            # ✅ 체크박스가 눌렸는지 확인하고 검색어(query)를 똑똑하게 바꿉니다!
+            # ✅ 선택한 메뉴에 따라 기본 검색어 정하기 (예: '아무거나'면 '맛집', 아니면 '한식')
+            base_keyword = "맛집" if cuisine == "아무거나" else cuisine
+            
+            # ✅ 체크박스에 따라 최종 검색어 조립하기
             if is_kids_friendly:
-                # "광명 맛집" 대신 "광명 놀이방 식당" 또는 "광명 아기랑 식당"으로 검색!
-                # 검색어를 리스트에서 랜덤으로 골라서 더 다양한 결과가 나오게 해봐요.
-                kids_keywords = ["놀이방 식당", "아기랑 맛집", "예스키즈존", "캠핑 식당"]
-                query = f"{location} {random.choice(kids_keywords)}"
+                kids_keywords = ["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]
+                # 예: "광명 한식 예스키즈존" 으로 검색!
+                query = f"{location} {base_keyword} {random.choice(kids_keywords)}"
             else:
-                query = f"{location} 맛집"
+                # 예: "광명 중식" 으로 검색!
+                query = f"{location} {base_keyword}"
 
             url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
             headers = {"Authorization": f"KakaoAK {api_key}"}
 
-            # ...(아래 데이터를 받아오는 requests.get 부분은 기존과 동일하게 둡니다)...
+        # ...(이 아래 부분은 파이썬이 사진 가져오고 결과 보여주는 기존 코드 그대로 둡니다!)...
         
         # 1페이지부터 3페이지까지 (최대 45개) 반복해서 카카오에게 달라고 조르기!
         for page in range(1, 4): 
