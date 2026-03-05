@@ -18,7 +18,7 @@ if not st.session_state.logged_in:
 
 # --- 3. 로그인 성공 시에만 나타나는 진짜 내 앱 화면 ---
 if st.session_state.logged_in:
-    st.title("정기흡수 메뉴 고르기 👈(ﾟヮﾟ👈)")
+    st.title("선택의 요정 🧚")
     st.write("버튼을 누르면 카카오 지도가 식당을 하나 골라줍니다!")
 
     # 내 출입증과 동네 설정
@@ -26,7 +26,7 @@ if st.session_state.logged_in:
     
 # 사용자가 직접 동네를 입력할 수 있는 창!
     location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
-    st.write("예시: 광명역, 부천역, 시흥 배곧 등 자유롭게 적어보세요!")
+    st.write("예시: 광명역, 부천역, 여의도동 등 자유롭게 적어보세요!")
 
     # --- 🎁 새로운 맞춤형 기능: 체크박스 만들기 ---
     st.write("---") # 화면에 예쁜 가로줄을 하나 그어줍니다
