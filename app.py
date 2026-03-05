@@ -24,14 +24,35 @@ if st.session_state.logged_in:
     # 내 출입증과 동네 설정
     api_key = "ab13d19ee1e9080db6e7c939474ebb5c"
     
-    # 사용자가 직접 동네를 입력할 수 있는 창!
-    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "여의도동") 
-    st.write("예시: 광명역, 부천역, 여의도동 등 자유롭게 적어보세요!")
+# 사용자가 직접 동네를 입력할 수 있는 창!
+    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
+    st.write("예시: 광명역, 부천역, 시흥 배곧 등 자유롭게 적어보세요!")
 
-# --- 마법의 클릭 버튼 만들기 ---
+    # --- 🎁 새로운 맞춤형 기능: 체크박스 만들기 ---
+    st.write("---") # 화면에 예쁜 가로줄을 하나 그어줍니다
+    
+    # 체크박스를 누르면 is_kids_friendly 가 True(참)가 됩니다
+    is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
+    
+    # --- 마법의 클릭 버튼 만들기 ---
     if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
         
-        restaurants = [] # 식당을 담을 빈 바구니 준비
+        restaurants = []
+        
+        for page in range(1, 4): 
+            # ✅ 체크박스가 눌렸는지 확인하고 검색어(query)를 똑똑하게 바꿉니다!
+            if is_kids_friendly:
+                # "광명 맛집" 대신 "광명 놀이방 식당" 또는 "광명 아기랑 식당"으로 검색!
+                # 검색어를 리스트에서 랜덤으로 골라서 더 다양한 결과가 나오게 해봐요.
+                kids_keywords = ["놀이방 식당", "아기랑 맛집", "예스키즈존", "캠핑 식당"]
+                query = f"{location} {random.choice(kids_keywords)}"
+            else:
+                query = f"{location} 맛집"
+
+            url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
+            headers = {"Authorization": f"KakaoAK {api_key}"}
+
+            # ...(아래 데이터를 받아오는 requests.get 부분은 기존과 동일하게 둡니다)...
         
         # 1페이지부터 3페이지까지 (최대 45개) 반복해서 카카오에게 달라고 조르기!
         for page in range(1, 4): 
