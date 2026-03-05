@@ -85,11 +85,32 @@ if st.session_state.logged_in:
             
             # 2. 카카오 이미지 검색 API로 방금 뽑힌 식당 사진 찾아오기!
             image_query = f"{location} {selected_restaurant}" # 예: "광명역 홍콩반점"
-            image_search_url = f"https://dapi.kakao.com/v2/search/image?query={image_query}&size=1"
-            
-            # 출입증(headers)은 아까 지도 검색할 때 썼던 걸 그대로 씁니다
-            image_response = requests.get(image_search_url, headers=headers)
-            image_result = image_response.json()
+# --- 🛡️ 에러 방어막(try-except) 시작! ---
+            try:
+                image_search_url = "https://dapi.kakao.com/v2/search/image"
+                params = {
+                    "query": f"{location} {selected_restaurant}",
+                    "size": 1
+                }
+                
+                image_response = requests.get(image_search_url, headers=headers, params=params)
+                image_result = image_response.json()
+                
+                # --- 🚨 여기서부터 바뀝니다! ---
+                if image_result.get('documents'):
+                    img_url = image_result['documents'][0]['image_url']
+                    
+                    # 주소만 띡 던져주지 않고, 파이썬(requests)이 직접 사진 데이터를 다운로드합니다!
+                    img_data = requests.get(img_url).content
+                    
+                    # 다운받은 사진 데이터(img_data)를 화면에 띄웁니다
+                    st.image(img_data, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
+                else:
+                    st.info("앗, 이 식당은 인터넷에서 사진을 찾지 못했어요 😢")
+                    
+            except Exception as e:
+                st.info("사진을 불러오지 못했어요. 식당 이름으로 만족해 주세요! 😅")
+            # --- 🛡️ 에러 방어막 끝! ---
             
             # 3. 사진이 성공적으로 찾아졌다면 화면에 예쁘게 띄우기
             if image_result.get('documents'):
