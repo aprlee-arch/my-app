@@ -112,13 +112,6 @@ if st.session_state.logged_in:
                 st.info("사진을 불러오지 못했어요. 식당 이름으로 만족해 주세요! 😅")
             # --- 🛡️ 에러 방어막 끝! ---
             
-            # 3. 사진이 성공적으로 찾아졌다면 화면에 예쁘게 띄우기
-            if image_result.get('documents'):
-                img_url = image_result['documents'][0]['image_url']
-                # st.image()가 스트림릿에서 마법처럼 사진을 띄워주는 명령어입니다
-                st.image(img_url, caption=f"📸 {selected_restaurant} 관련 사진", use_container_width=True)
-            else:
-                st.info("앗, 이 식당은 인터넷에서 사진을 찾지 못했어요 😢")
     
         else:
             st.error("앗, 식당을 찾지 못했어요. 동네 이름을 다시 확인해 보세요!")
