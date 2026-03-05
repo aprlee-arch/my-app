@@ -37,7 +37,7 @@ if st.session_state.logged_in:
     # 2. 아이 동반 체크박스
     is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
 
-
+    st.write("---") 
     # --- 마법의 클릭 버튼 만들기 ---
     if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
         
