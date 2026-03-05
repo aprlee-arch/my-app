@@ -82,7 +82,7 @@ if st.session_state.logged_in:
             st.subheader(f"👉 [ {selected_restaurant} ] 👈")
             
             # ⭐️ 3. 대망의 상세보기 버튼 띄우기! (스트림릿의 마법 버튼)
-            st.link_button("🗺️ 카카오맵에서 방문자 리뷰 & 메뉴판 확인하기", restaurant_link)
+            st.link_button("📣 카카오맵에서 방문자 리뷰 & 메뉴판 확인하기", restaurant_link)
             
             # --- 🛡️ 에러 방어막(try-except) 시작! (사진 띄우기) ---
             try:
