@@ -58,14 +58,14 @@ if st.session_state.logged_in:
             # 방문 목적에 따라 검색어에 살 붙이기
             purpose_keyword = ""
             if purpose == "점심식사": purpose_keyword = "점심" # '점심 맛집'이나 '점심'으로 적으셔도 좋아요!
-            elif purpose == "데이트/분위기": purpose_keyword = "분위기 좋은"
-            elif purpose == "가족 모임": purpose_keyword = "룸식당 가족모임"
-            elif purpose == "가성비/혼밥": purpose_keyword = "가성비 혼밥"
+            elif purpose == "데이트/분위기": purpose_keyword = "데이트"
+            elif purpose == "가족 모임": purpose_keyword = "가족모임"
+            elif purpose == "가성비/혼밥": purpose_keyword = "혼밥"
             
             # 최종 검색어 완성! (예: "광명 한식 분위기 좋은 놀이방 식당")
             query_parts = [location, base_keyword, purpose_keyword]
             if is_kids_friendly:
-                query_parts.append(random.choice(["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]))
+                query_parts.append(random.choice(["놀이방 식당", "아기랑", "예스키즈존"]))
             
             # 빈칸을 기준으로 단어들을 예쁘게 이어 붙여줍니다
             query = " ".join([word for word in query_parts if word])
