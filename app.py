@@ -30,36 +30,46 @@ if st.session_state.logged_in:
     with st.sidebar:
         st.header("🔎 맛집 검색 설정")
         
-        # 1. 지역 입력창
+        # 1. 지역 및 음식 종류
         location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
-        st.write("예시: 광명, 부천, 시흥, 안양 등 자유롭게 적어보세요!")
+        cuisine = st.selectbox("🍜 어떤 음식이 땡기시나요?", ["아무거나", "한식", "중식", "일식", "양식", "분식"])
         
         st.write("---") 
         
-        # 2. 음식 종류 및 체크박스
-        cuisine = st.selectbox("🍜 어떤 종류의 음식이 땡기시나요?", ["아무거나", "한식", "중식", "일식", "양식", "분식"])
-        is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
+        # ⭐️ 2. 방문 목적 선택창 (새로 추가!)
+        purpose = st.selectbox("🎯 방문 목적이 무엇인가요?", ["상관없음", "데이트/분위기", "가족 모임", "가성비/혼밥", "회식/술자리"])
+        
+        # 3. 아이 동반 체크박스
+        is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당")
         
         st.write("---")
-        
-        # 3. 마법의 클릭 버튼도 사이드바 안으로 쏙!
-        # 버튼을 누르면 search_clicked 가 True(참)가 됩니다.
         search_clicked = st.button("🎲 오늘 뭐 먹지? (클릭!)")
 
     # --- 메인 화면 (오른쪽 결과창) ---
-    # 사이드바의 버튼이 눌렸을 때만 아래 카카오 API 코드가 실행됩니다!
     if search_clicked:
-        
         restaurants = []
-        
         for page in range(1, 4): 
-            # (이 아래부터는 기존 카카오 API 요청 코드와 동일하게 유지하시면 됩니다!)
+            # ✅ 검색어 조립의 마법!
             base_keyword = "맛집" if cuisine == "아무거나" else cuisine
+            
+            # 방문 목적에 따라 검색어에 살 붙이기
+            purpose_keyword = ""
+            if purpose == "점심식사": purpose_keyword = "점심특선" # '점심 맛집'이나 '점심'으로 적으셔도 좋아요!
+            elif purpose == "데이트/분위기": purpose_keyword = "분위기 좋은"
+            elif purpose == "가족 모임": purpose_keyword = "룸식당 가족모임"
+            elif purpose == "가성비/혼밥": purpose_keyword = "가성비 혼밥"
+            elif purpose == "회식/술자리": purpose_keyword = "회식 술집"
+
+            # 최종 검색어 완성! (예: "광명 한식 분위기 좋은 놀이방 식당")
+            query_parts = [location, base_keyword, purpose_keyword]
             if is_kids_friendly:
-                kids_keywords = ["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]
-                query = f"{location} {base_keyword} {random.choice(kids_keywords)}"
-            else:
-                query = f"{location} {base_keyword}"
+                query_parts.append(random.choice(["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]))
+            
+            # 빈칸을 기준으로 단어들을 예쁘게 이어 붙여줍니다
+            query = " ".join([word for word in query_parts if word])
+
+            url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
+            # ...(이 아래 API 요청 코드는 그대로 유지합니다!)...
 
             url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={query}&category_group_code=FD6&page={page}"
             headers = {"Authorization": f"KakaoAK {api_key}"}
