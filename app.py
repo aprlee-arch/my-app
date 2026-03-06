@@ -36,14 +36,17 @@ if st.session_state.logged_in:
         
         st.write("---") 
         
-        # ⭐️ 2. 방문 목적 선택창 (새로 추가!)
-        purpose = st.selectbox("🎯 방문 목적이 무엇인가요?", ["상관없음", "데이트/분위기", "가족 모임", "가성비/혼밥", "회식/술자리"])
+        # ⭐️ 2. 방문 목적 선택창 (여기에 '점심식사'가 쏙 들어갔습니다!)
+        purpose = st.selectbox("🎯 방문 목적이 무엇인가요?", ["상관없음", "점심식사", "데이트/분위기", "가족 모임", "가성비/혼밥", "회식/술자리"])
         
         # 3. 아이 동반 체크박스
         is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당")
         
         st.write("---")
         search_clicked = st.button("🎲 오늘 뭐 먹지? (클릭!)")
+
+    # --- 메인 화면 (오른쪽 결과창) ---
+    # (이 아래 if search_clicked: 부분은 그대로 두시면 됩니다!)
 
     # --- 메인 화면 (오른쪽 결과창) ---
     if search_clicked:
