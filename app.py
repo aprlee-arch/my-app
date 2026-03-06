@@ -26,28 +26,34 @@ if st.session_state.logged_in:
     # 내 출입증과 동네 설정
     api_key = "ab13d19ee1e9080db6e7c939474ebb5c"
     
-# 사용자가 직접 동네를 입력할 수 있는 창!
-    location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명사거리역") 
-    st.write("예시: 광명역, 부천역, 여의도동, 은행로 54 등 자유롭게 적어보세요!")
+# --- 🎁 마법의 사이드바 (왼쪽 메뉴) 만들기 ---
+    with st.sidebar:
+        st.header("🔎 맛집 검색 설정")
+        
+        # 1. 지역 입력창
+        location = st.text_input("🔍 어느 지역 맛집을 찾으시나요?", "광명") 
+        st.write("예시: 광명, 부천, 시흥, 안양 등 자유롭게 적어보세요!")
+        
+        st.write("---") 
+        
+        # 2. 음식 종류 및 체크박스
+        cuisine = st.selectbox("🍜 어떤 종류의 음식이 땡기시나요?", ["아무거나", "한식", "중식", "일식", "양식", "분식"])
+        is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
+        
+        st.write("---")
+        
+        # 3. 마법의 클릭 버튼도 사이드바 안으로 쏙!
+        # 버튼을 누르면 search_clicked 가 True(참)가 됩니다.
+        search_clicked = st.button("🎲 오늘 뭐 먹지? (클릭!)")
 
-    # --- 🎁 새로운 맞춤형 기능: 음식 종류 & 체크박스 ---
-    st.write("---") 
-    
-    # 1. 음식 종류를 선택하는 깔끔한 메뉴 창 만들기
-    cuisine = st.selectbox("🍜 어떤 종류의 음식이 땡기시나요?", ["아무거나", "한식", "중식", "일식", "양식", "분식"])
-
-    # 2. 아이 동반 체크박스
-    is_kids_friendly = st.checkbox("👶 아이들과 맘 편히 갈 수 있는 식당만 찾기 (놀이방, 캠핑 감성 등)")
-
-    st.write("---") 
-
-    
-# --- 마법의 클릭 버튼 만들기 ---
-    if st.button("🎲 오늘 뭐 먹지? (클릭!)"):
+    # --- 메인 화면 (오른쪽 결과창) ---
+    # 사이드바의 버튼이 눌렸을 때만 아래 카카오 API 코드가 실행됩니다!
+    if search_clicked:
         
         restaurants = []
         
         for page in range(1, 4): 
+            # (이 아래부터는 기존 카카오 API 요청 코드와 동일하게 유지하시면 됩니다!)
             base_keyword = "맛집" if cuisine == "아무거나" else cuisine
             if is_kids_friendly:
                 kids_keywords = ["놀이방 식당", "아기랑", "예스키즈존", "캠핑 식당"]
