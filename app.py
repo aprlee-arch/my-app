@@ -128,7 +128,7 @@ if st.session_state.logged_in:
                 
                 # 3. Outdoors 테마로 멋진 지도 그리기!
                 st.pydeck_chart(pdk.Deck(
-                    map_style='mapbox://styles/mapbox/streets-v11', 
+                    map_style='road', 
                     initial_view_state=view_state,
                     layers=[layer]
                 ))
