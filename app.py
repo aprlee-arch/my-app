@@ -58,8 +58,7 @@ if st.session_state.logged_in:
             elif purpose == "데이트/분위기": purpose_keyword = "분위기 좋은"
             elif purpose == "가족 모임": purpose_keyword = "룸식당 가족모임"
             elif purpose == "가성비/혼밥": purpose_keyword = "가성비 혼밥"
-            elif purpose == "회식/술자리": purpose_keyword = "회식 술집"
-
+            
             # 최종 검색어 완성! (예: "광명 한식 분위기 좋은 놀이방 식당")
             query_parts = [location, base_keyword, purpose_keyword]
             if is_kids_friendly:
