@@ -121,7 +121,7 @@ if st.session_state.logged_in:
                     'ScatterplotLayer',
                     data=map_data,
                     get_position=['lon', 'lat'],    # 👈 따옴표 제거!
-                    get_radius=50,                  # 점의 크기
+                    get_radius=20,                  # 점의 크기
                     get_fill_color=[255, 50, 50],   # 👈 따옴표 완전 제거! (숫자 리스트로 변경)
                     pickable=True
                 )
